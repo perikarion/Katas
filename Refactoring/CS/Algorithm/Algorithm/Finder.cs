@@ -1,67 +1,35 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Algorithm
 {
     public class Finder
     {
-        private readonly List<Thing> _p;
+        private readonly List<Person> _person;
 
-        public Finder(List<Thing> p)
+        public Finder(List<Person> person)
         {
-            _p = p;
+            _person = person;
         }
 
-        public F Find(FT ft)
+        public Pair Find(FindType findType)
         {
-            var tr = new List<F>();
+            var results = GetPairs();
 
-            for(var i = 0; i < _p.Count - 1; i++)
-            {
-                for(var j = i + 1; j < _p.Count; j++)
-                {
-                    var r = new F();
-                    if(_p[i].BirthDate < _p[j].BirthDate)
-                    {
-                        r.P1 = _p[i];
-                        r.P2 = _p[j];
-                    }
-                    else
-                    {
-                        r.P1 = _p[j];
-                        r.P2 = _p[i];
-                    }
-                    r.D = r.P2.BirthDate - r.P1.BirthDate;
-                    tr.Add(r);
-                }
-            }
+            if(results.Count() < 1)
+                return new Pair();
+            
+            if (findType == FindType.ClosestAge)
+                return results.OrderBy(x => x.Delta).First();
+            return results.OrderByDescending(x => x.Delta).First();
 
-            if(tr.Count < 1)
-            {
-                return new F();
-            }
+        }
 
-            F answer = tr[0];
-            foreach(var result in tr)
-            {
-                switch(ft)
-                {
-                    case FT.One:
-                        if(result.D < answer.D)
-                        {
-                            answer = result;
-                        }
-                        break;
-
-                    case FT.Two:
-                        if(result.D > answer.D)
-                        {
-                            answer = result;
-                        }
-                        break;
-                }
-            }
-
-            return answer;
+        private IEnumerable<Pair> GetPairs()
+        {
+            for (var i = 0; i < _person.Count - 1; i++)
+                for (var j = i + 1; j < _person.Count; j++)
+                    yield return new Pair(_person[i], _person[j]);                 
         }
     }
 }
